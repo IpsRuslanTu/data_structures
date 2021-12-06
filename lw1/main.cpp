@@ -4,37 +4,42 @@ using namespace std;
 
 struct Stack
 {
-    string stack_data;
+    string stackData;
     Stack *link;
 };
 
-struct Queue_node
+struct Queue
 {
     string queueName;
     Stack *topStack;
-    Queue_node *next;
+    Queue *next;
 };
 
-Queue_node *front = nullptr;
-Queue_node *rear = nullptr;
+Queue *front = nullptr;
+Queue *rear = nullptr;
 
-bool isEmptyQueue(); 
+bool isEmptyQueue();
 void addToQueue();
 void deleteFromQueue();
 void showFrontQueue();
 void displayQueue();
 
-void pushStack(Queue_node *FrontEl);
-void popStack(Queue_node *FrontEl);
-void displayStack(Queue_node *FrontEl);
+void pushStack(Queue *frontQueue);
+void popStack(Queue *frontQueue);
+void displayStack(Queue *frontQueue);
 
 int main()
 {
     char userCommand;
     do
     {
-        cout << "Queue operation:\n\n1. Add element\n2. Delete element\n3. Display queue\n"
-            "4. Operation with front element of queue\n5. Exit\n\nChoose command > ";
+        cout << "Queue operation:\n\n" 
+             << "1. Add element\n"
+             << "2. Delete element\n"
+             << "3. Display queue\n"
+             << "4. Operation with front element of queue\n"
+             << "5. Exit\n\n"
+             << "Choose command > ";
         cin >> userCommand;
         cout << endl;
         switch (userCommand)
@@ -56,12 +61,15 @@ int main()
                         char subMenuCommand;
                         do
                         {
-                            cout << "1. Add to stack\n2. Delete from stack\n3. Display stack\n"
-                                "4. Return to main menu\n\nChoose command > ";
+                            cout << "1. Add to stack\n"
+                                 << "2. Delete from stack\n"
+                                 << "3. Display stack\n"
+                                 << "4. Return to main menu\n\n"
+                                 << "Choose command > ";
                             cin >> subMenuCommand;
                             cout << endl;
                             switch (subMenuCommand)
-                                {
+                            {
                                 case '1':
                                     pushStack(front);
                                     break;
@@ -74,7 +82,7 @@ int main()
                                 default:
                                     cout << "\nError command. Try again\n\n";
                                     break;
-                                }
+                            }
                         } while (subMenuCommand != '4');
                     }
                 break;
@@ -100,7 +108,7 @@ void addToQueue()
     string value;
     cout << "Name of queue element > ";
     cin >> value;
-    Queue_node *ptr = new Queue_node();
+    Queue *ptr = new Queue();
     ptr -> queueName = value;
     ptr -> topStack = nullptr;
     ptr -> next = nullptr;
@@ -122,19 +130,19 @@ void deleteFromQueue()
 {
     if (isEmptyQueue()) cout << "\nQueue is empty\n";
     else
+    {
+        if (front == rear)
         {
-            if( front == rear)
-            {
-                delete(front);
-                front = rear = nullptr;
-            }
-            else
-            {
-                Queue_node *ptr = front;
-                front = front -> next;
-                delete(ptr);
-            }
+            delete(front);
+            front = rear = nullptr;
         }
+        else
+        {
+            Queue *ptr = front;
+            front = front -> next;
+            delete(ptr);
+        }
+    }
 }
 
 void showFrontQueue()
@@ -150,7 +158,7 @@ void displayQueue()
     else
     {
         cout << "\nQueue is: ";
-        Queue_node *ptr = front;
+        Queue *ptr = front;
         while (ptr != nullptr)
         {
             cout << ptr -> queueName << " ";
@@ -160,46 +168,46 @@ void displayQueue()
     }
 }
 
-void pushStack(Queue_node *FrontEl) 
+void pushStack(Queue *frontQueue) 
 {
    string value;
    cout << "input stack element > ";
    cin >> value;
     
-   struct Stack* newStack = new Stack();
-   newStack -> stack_data = value;
-   newStack -> link = FrontEl -> topStack;
-   FrontEl -> topStack = newStack;
+   Stack *newStack = new Stack();
+   newStack -> stackData = value;
+   newStack -> link = frontQueue -> topStack;
+   frontQueue -> topStack = newStack;
 }
 
-void displayStack(Queue_node *FrontEl) 
+void displayStack(Queue *frontQueue) 
 {
-    if (FrontEl -> topStack == nullptr)
+    if (frontQueue -> topStack == nullptr)
         cout << "Stack is empty\n";
     else {
         Stack* ptr;
-        ptr = (FrontEl -> topStack);
+        ptr = (frontQueue -> topStack);
         cout << "Stack elements are: ";
         while (ptr != nullptr) 
         {
-            cout << ptr -> stack_data << " ";
+            cout << ptr -> stackData << " ";
             ptr = ptr -> link;
         }
    }
    cout << endl;
 }
 
-void popStack(Queue_node *FrontEl) 
+void popStack(Queue *frontQueue) 
+{
+    if (frontQueue -> topStack == nullptr)
+        cout << "Stack is empty\n\n";
+    else 
     {
-        if (FrontEl -> topStack == nullptr)
-            cout << "Stack is empty\n\n";
-        else 
-        {
-            cout << "The popped element is " << FrontEl -> topStack -> stack_data << "\n\n";
-            Stack *tempStack;
-            tempStack = FrontEl -> topStack;
-            (FrontEl -> topStack) = (FrontEl -> topStack -> link);
-            delete(tempStack);
-            tempStack = nullptr;
-        }
+        cout << "The popped element is " << frontQueue -> topStack -> stackData << "\n\n";
+        Stack *tempStack;
+        tempStack = frontQueue -> topStack;
+        frontQueue -> topStack = frontQueue -> topStack -> link;
+        delete(tempStack);
+        tempStack = nullptr;
+    }
 }
