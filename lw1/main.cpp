@@ -27,13 +27,14 @@ void displayQueue();
 void pushStack(Queue *frontQueue);
 void popStack(Queue *frontQueue);
 void displayStack(Queue *frontQueue);
+void showAllStructures(Queue *frontQueue);
 
 int main()
 {
     char userCommand;
     do
     {
-        cout << "Queue operation:\n\n" 
+        cout << "Queue operation:\n" 
              << "1. Add element\n"
              << "2. Delete element\n"
              << "3. Display queue\n"
@@ -41,23 +42,29 @@ int main()
              << "5. Exit\n\n"
              << "Choose command > ";
         cin >> userCommand;
-        cout << endl;
+        cout << "\n";
         switch (userCommand)
         {
             case '1': 
                 addToQueue();
+                showAllStructures(front);
                 break;
             case '2': 
                 deleteFromQueue();
+                showAllStructures(front);
                 break;
             case '3': 
-                displayQueue();
+                if (isEmptyQueue()) cout << "Queue and stack is empty\n\n";
+                else
+                {
+                    showAllStructures(front);
+                }
                 break;
             case '4': 
-                if (isEmptyQueue()) cout << "\nQueue is empty\n";
+                if (isEmptyQueue()) cout << "Queue is empty\n\n";
                 else
                     {                
-                        showFrontQueue();
+                        showAllStructures(front);
                         char subMenuCommand;
                         do
                         {
@@ -72,15 +79,19 @@ int main()
                             {
                                 case '1':
                                     pushStack(front);
+                                    showAllStructures(front);
                                     break;
                                 case '2':
                                     popStack(front);
+                                    showAllStructures(front);
                                     break;
                                 case '3':
-                                    displayStack(front);
+                                    showAllStructures(front);
+                                    break;
+                                case '4':
                                     break;
                                 default:
-                                    cout << "\nError command. Try again\n\n";
+                                    cout << "Error command. Try again\n\n";
                                     break;
                             }
                         } while (subMenuCommand != '4');
@@ -88,7 +99,7 @@ int main()
                 break;
             case '5':
                 break;
-            default: cout << "\nError command. Try again\n\n";
+            default: cout << "Error command. Try again\n\n";
                 break;
         }
     } while (userCommand != '5');
@@ -128,9 +139,10 @@ void addToQueue()
 
 void deleteFromQueue()
 {
-    if (isEmptyQueue()) cout << "\nQueue is empty\n";
+    if (isEmptyQueue()) cout << "There is nothing to delete in queue.\n\n";
     else
     {
+        cout << "Deleted front queue: " << front -> queueName << "\n\n";
         if (front == rear)
         {
             delete(front);
@@ -147,17 +159,17 @@ void deleteFromQueue()
 
 void showFrontQueue()
 {
-    if (isEmptyQueue()) cout << "\nQueue is empty\n";
+    if (isEmptyQueue()) cout << "Queue is empty\n";
     else
-        cout << "\nElement at front of queue is: " << front -> queueName << "\n\n";
+        cout << "Front queue is: " << front -> queueName << "\n\n";
 }
 
 void displayQueue()
 {
-    if (isEmptyQueue()) cout << "\nQueue is empty\n\n";
+    if (isEmptyQueue()) cout << "Queue is empty\n\n";
     else
     {
-        cout << "\nQueue is: ";
+        cout << "Queue is: ";
         Queue *ptr = front;
         while (ptr != nullptr)
         {
@@ -170,44 +182,51 @@ void displayQueue()
 
 void pushStack(Queue *frontQueue) 
 {
-   string value;
-   cout << "input stack element > ";
-   cin >> value;
-    
-   Stack *newStack = new Stack();
-   newStack -> stackData = value;
-   newStack -> link = frontQueue -> topStack;
-   frontQueue -> topStack = newStack;
+    string value;
+    cout << "input stack element > ";
+    cin >> value;
+
+    Stack *newStack = new Stack();
+    newStack -> stackData = value;
+    newStack -> link = frontQueue -> topStack;
+    frontQueue -> topStack = newStack;
+    cout << "\n\n";
 }
 
 void displayStack(Queue *frontQueue) 
 {
-    if (frontQueue -> topStack == nullptr)
+    if ((frontQueue == nullptr) || (frontQueue -> topStack == nullptr))
         cout << "Stack is empty\n";
     else {
         Stack* ptr;
         ptr = (frontQueue -> topStack);
-        cout << "Stack elements are: ";
+        cout << "Stack is: ";
         while (ptr != nullptr) 
         {
             cout << ptr -> stackData << " ";
             ptr = ptr -> link;
         }
    }
-   cout << endl;
+   cout << "\n\n";
 }
 
 void popStack(Queue *frontQueue) 
 {
     if (frontQueue -> topStack == nullptr)
-        cout << "Stack is empty\n\n";
+        cout << "There is nothing to delete in stack.\n\n";
     else 
     {
-        cout << "The popped element is " << frontQueue -> topStack -> stackData << "\n\n";
+        cout << "Deleted stack element: " << frontQueue -> topStack -> stackData << "\n\n";
         Stack *tempStack;
         tempStack = frontQueue -> topStack;
         frontQueue -> topStack = frontQueue -> topStack -> link;
         delete(tempStack);
         tempStack = nullptr;
     }
+}
+
+void showAllStructures(Queue *frontQueue)
+{
+    displayQueue();
+    displayStack(frontQueue);
 }
