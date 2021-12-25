@@ -15,8 +15,9 @@ struct Tree
 
 int read_from_file(ifstream &F, Tree *&r);          // чтение из файла, формирование дерева
 void free_tree(Tree *&p);                           // очистка дерева
-void findLevelPersons(Tree *&p, Tree *&newPerson, int level, string human);
+void findPersonInTree(Tree *&p, Tree *&newPerson, int level, int numberHuman, string humanName);
 void LCA(Tree *u, Tree *v);
+void enterNamePerson(Tree *&root, Tree *&Person, int level, int numberHuman);
 
 int main(int argc, char* argv[])
 {
@@ -42,30 +43,22 @@ int main(int argc, char* argv[])
 	getchar();
 
     char replay = 'y';
-
     do {
-        string human1, human2;
-        cout << "\nEnter the first person to search for ancestor: ";
-        cin >> human1;
-        cout << "\nEnter the second person to search for ancestor: ";
-        cin >> human2;
-
-        Tree *Person1, *Person2;
-
-        findLevelPersons(root, Person1, 0, human1);
-        findLevelPersons(root, Person2, 0, human2);
+        Tree *Person1 = 0, *Person2 = 0;
+        enterNamePerson(root, Person1, 0, 1);
+        enterNamePerson(root, Person2, 0, 2);
 
         LCA(Person1, Person2);
 
         Person1 = 0; Person2 = 0;
 
-        cout << "Find out an ancestor for other people? y/n: ";
+        cout << "Enter 'Y' for the next search: ";
         cin >> replay;
 
     } while (replay == 'y' || replay == 'Y');
 
     free_tree(root);
-	cout << "Dynamic memory is released" << endl;
+	cout << "\nDynamic memory is released" << endl;
 	getchar();
 
 	return 0;
@@ -132,8 +125,30 @@ void free_tree(Tree *&p)
 	p = 0;
 }
 
+void findPersonInTree(Tree *&p, Tree *&newPerson, int level, int numberHuman, string humanName)
+{
+    cout << p -> name << endl;
+    if (p -> name == humanName) newPerson = p;
+    else if (p -> sons.size())
+        for (int i = 0; i < p -> sons.size(); i++) 
+            findPersonInTree(p -> sons[i], newPerson, level + 1, numberHuman, humanName);
+}
+
+void enterNamePerson(Tree *&root, Tree *&Person, int level, int numberHuman)
+{
+    do 
+    {
+        string humanName;
+        cout << "\nEnter name of " << numberHuman << " person to search for ancestor: ";
+        cin >> humanName;
+        findPersonInTree(root, Person, 0, numberHuman, humanName);
+        if (!Person) cout << "\nPerson does not exist in the tree, try again\n";
+    } while (Person == 0);
+}
+
 void LCA(Tree *u, Tree *v)
 {
+    cout << endl;
     string nameU = u -> name;
     string nameV = v -> name;
     while (u -> urov != v -> urov)
@@ -160,14 +175,6 @@ void LCA(Tree *u, Tree *v)
         u = u -> father;
         v = v -> father;
     }
-    cout << "Common ancestor is " << u -> name << endl;
-}
-
-void findLevelPersons(Tree *&p, Tree *&newPerson, int level, string human)
-{
-    if (p -> name == human) newPerson = p;
-
-    if (p -> sons.size())
-        for (int i = 0; i < p -> sons.size(); i++) 
-            findLevelPersons(p -> sons[i], newPerson, level + 1, human);
+    cout << "Common ancestor of " << nameU << " and " << nameV << " is " << u -> name << endl;
+    cout << endl;
 }
