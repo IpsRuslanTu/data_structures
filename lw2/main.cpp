@@ -1,3 +1,19 @@
+/*                                      Тухватуллин Р. Р.  ИПС - 21
+                                        VS Code - 1.63.2
+В файле <input> дерево в виде
+Ann
+.Boris
+..Cat
+..Dora
+...Eva
+...Fred
+...Nata
+.Nina
+
+Программа выполняет поиск, кто из введеных двух человек является предком другому. Если никто из 
+данных людей не является предком, то программа найдет их ближайшего родственника. */
+
+
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -27,6 +43,7 @@ int main(int argc, char* argv[])
 		getchar();
 		return 1;
 	}
+
 	ifstream Fin(argv[1]);      // ifstream Fin("input.txt");
 	if (!Fin)
 	{
@@ -34,6 +51,7 @@ int main(int argc, char* argv[])
 		getchar();
 		return 1;
 	}
+
     Tree *root = 0;
 
     read_from_file(Fin, root);
@@ -127,7 +145,6 @@ void free_tree(Tree *&p)
 
 void findPersonInTree(Tree *&p, Tree *&newPerson, int level, int numberHuman, string humanName)
 {
-    cout << p -> name << endl;
     if (p -> name == humanName) newPerson = p;
     else if (p -> sons.size())
         for (int i = 0; i < p -> sons.size(); i++) 
