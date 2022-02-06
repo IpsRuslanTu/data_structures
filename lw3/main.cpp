@@ -15,75 +15,26 @@ struct Point
 };
 
 void readPointsfromFile(vector<Point> &arr);
+void createMatrix(vector<Point> arrOfCoords, vector<vector<int>> &arrGraph);
 void DFS(vector<vector<int>> graphMatrix, int maxLengthOfGraph, vector<int> &path, int &start);
+int findElemWithMaxPaths(vector<vector<int>> graphMatrix, int numOfPoints);
+void printMatrix(vector<vector<int>> graphMatrix, int numOfPoints);
+void printPath(vector<int> arrPath);
 
 int main()
 {
   system("cls");
 
-  vector<int> truePath;                     // для хранения пути
-  vector<Point> arrOfPoints;                // хранение координат точек
+  vector<int> truePath;      // для хранения пути
+  vector<Point> arrOfPoints; // хранение координат точек
   readPointsfromFile(arrOfPoints);
-  int numberOfPoints = arrOfPoints.size();  // количество элементов
-
+  int numberOfPoints = arrOfPoints.size(); // количество элементов
   vector<vector<int>> graph(numberOfPoints, vector<int>(numberOfPoints, 0));
-  vector<int> distance(numberOfPoints, 0);
-
-  string nameFileCurves;
-  cout << "Enter file name with curves around of points: ";
-  cin >> nameFileCurves;
-
-  ifstream fileCurves(nameFileCurves);
-  int startPoint;
-  int endPoint;
-
-  int intervalX;
-  int intervalY;
-  int intervalMain;
-
-  while (!fileCurves.eof())
-  {
-    fileCurves >> startPoint >> endPoint;
-
-    // Вычисление расстояния между точками
-    intervalX = arrOfPoints[startPoint].x - arrOfPoints[endPoint].x;
-    intervalY = arrOfPoints[startPoint].y - arrOfPoints[endPoint].y;
-    intervalMain = sqrt(pow(intervalX, 2) + pow(intervalY, 2));
-
-    // Ввод данных в матрицу смежности
-    graph[startPoint][endPoint] = intervalMain;
-    graph[endPoint][startPoint] = intervalMain;
-
-    // Поиск элемента, имеющего наибольшую суммарную длину связей с другими элементами
-    distance[startPoint] += intervalMain;
-    distance[endPoint] += intervalMain;
-  }
-  fileCurves.close();
-
-  int maxDistance = 0;
-  int mainPoint;
-
-  for (int i = 0; i < distance.size(); i++)
-    if (distance[i] > maxDistance)
-    {
-      mainPoint = i;
-      maxDistance = distance[i];
-    }
-  cout << "Point with a long path length: " << mainPoint << endl;
-
-  // Печать матрицы смежности
-  for (int i = 0; i < numberOfPoints; i++)
-  {
-    for (int j = 0; j < numberOfPoints; j++)
-      printf("%4d", graph[i][j]);
-    cout << endl;
-  }
-
-  truePath.push_back(mainPoint);
-  DFS(graph, numberOfPoints, truePath, mainPoint);
-
-  for (int i = 0; i < truePath.size(); i++)
-    cout << truePath[i] << " - ";
+  createMatrix(arrOfPoints, graph);
+  int startElement = findElemWithMaxPaths(graph, numberOfPoints);
+  printMatrix(graph, numberOfPoints);
+  DFS(graph, numberOfPoints, truePath, startElement);
+  printPath(truePath);
 
   return 0;
 }
@@ -114,8 +65,87 @@ void readPointsfromFile(vector<Point> &arr)
   filePoints.close();
 }
 
+void createMatrix(vector<Point> arrOfCoords, vector<vector<int>> &arrGraph)
+{
+  string nameFileCurves;
+  cout << "Enter file name with curves around of points: ";
+  cin >> nameFileCurves;
+
+  ifstream fileCurves(nameFileCurves);
+  int startPoint;
+  int endPoint;
+
+  int intervalX;
+  int intervalY;
+  int intervalMain;
+
+  while (!fileCurves.eof())
+  {
+    fileCurves >> startPoint >> endPoint;
+
+    // Вычисление расстояния между точками
+    intervalX = arrOfCoords[startPoint].x - arrOfCoords[endPoint].x;
+    intervalY = arrOfCoords[startPoint].y - arrOfCoords[endPoint].y;
+    intervalMain = sqrt(pow(intervalX, 2) + pow(intervalY, 2));
+
+    // Ввод данных в матрицу смежности
+    arrGraph[startPoint][endPoint] = intervalMain;
+    arrGraph[endPoint][startPoint] = intervalMain;
+  }
+  fileCurves.close();
+}
+
+int findElemWithMaxPaths(vector<vector<int>> graphMatrix, int numOfPoints)
+{
+  int maxDistance = 0;
+  int mainPoint;
+
+  for (int i = 0; i < numOfPoints; i++)
+  {
+    int tempMaxDistance = 0;
+    for (int j = 0; j < numOfPoints; j++)
+    {
+      tempMaxDistance += graphMatrix[i][j];
+    }
+    if (tempMaxDistance > maxDistance)
+    {
+      maxDistance = tempMaxDistance;
+      mainPoint = i;
+    }
+  }
+  cout << "Element " << mainPoint << " has max length of paths = " << maxDistance << endl;
+  return mainPoint;
+}
+
+void printMatrix(vector<vector<int>> graphMatrix, int numOfPoints)
+{
+  string print;
+  cout << "Do you want to print the matrix? y/n : ";
+  cin >> print;
+
+  if (print == "y" || print == "Y")
+  {
+    for (int i = 0; i < numOfPoints; i++)
+    {
+      for (int j = 0; j < numOfPoints; j++)
+        printf("%4d", graphMatrix[i][j]);
+      cout << endl;
+    }
+  }
+}
+
+void printPath(vector<int> arrPath)
+{
+  cout << "The path from the point " << arrPath[0] << ", along the shortest paths, without cycles: " << endl;
+  for (int i = 0; i < arrPath.size(); i++)
+    cout << arrPath[i] << " - ";
+}
+
 void DFS(vector<vector<int>> graphMatrix, int maxLengthOfGraph, vector<int> &path, int &start)
 {
+
+  path.push_back(start);
+
   int minDistance = INT_MAX;
   int newStart;
 
@@ -131,7 +161,6 @@ void DFS(vector<vector<int>> graphMatrix, int maxLengthOfGraph, vector<int> &pat
 
   if (minDistance != INT_MAX)
   {
-    path.push_back(newStart);
     DFS(graphMatrix, maxLengthOfGraph, path, newStart);
   }
 }
